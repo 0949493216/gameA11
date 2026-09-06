@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมยอดนักสืบ Pattern ป.1</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt & Kanit -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Prompt', 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .bounce-slow {
+            animation: bounce 2s infinite;
+        }
+
+        .pop-in {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pulse-gentle {
+            animation: pulseGentle 1.5s infinite;
+        }
+
+        @keyframes pulseGentle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .item-card {
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 0 #cbd5e1;
+        }
+        .item-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #cbd5e1;
+        }
+
+        .choice-btn {
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 0 #94a3b8;
+        }
+        .choice-btn:hover {
+            transform: translateY(-2px);
+        }
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #94a3b8;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #certificate-modal, #certificate-modal * {
+                visibility: visible;
+            }
+            #certificate-modal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between p-3 md:p-6">
+
+    <!-- Header / Navbar -->
+    <header class="max-w-4xl mx-auto w-full flex items-center justify-between glass-panel p-3 md:p-4 rounded-3xl shadow-lg border-4 border-yellow-300 mb-4">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="showHomeScreen()">
+            <div class="w-12 h-12 md:w-14 md:h-14 bg-amber-400 rounded-full flex items-center justify-center text-2xl shadow-inner border-2 border-amber-500">
+                🐻
+            </div>
+            <div>
+                <h1 class="text-lg md:text-2xl font-bold text-amber-900 leading-tight">ยอดนักสืบ Pattern ป.1</h1>
+                <p class="text-xs md:text-sm text-amber-700 font-semibold">การหารูปแบบของปัญหา (วิทยากรถานคำนวณ)</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleSound()" id="sound-btn" class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-2.5 rounded-2xl border-2 border-blue-300 font-bold transition flex items-center space-x-1">
+                <i class="fas fa-volume-up text-lg" id="sound-icon"></i>
+            </button>
+            <button onclick="openGuideModal()" class="bg-emerald-400 hover:bg-emerald-500 text-white px-3 py-2 rounded-2xl border-b-4 border-emerald-600 font-bold text-sm md:text-base flex items-center space-x-1">
+                <i class="fas fa-book-open"></i>
+                <span class="hidden sm:inline">คู่มือ Pattern</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center items-center">
+
+        <!-- ================= SCREEN 1: HOME / START SCREEN ================= -->
+        <div id="home-screen" class="w-full glass-panel p-6 md:p-10 rounded-3xl shadow-2xl border-4 border-amber-300 text-center pop-in">
+            <div class="inline-block bg-amber-100 px-4 py-2 rounded-full text-amber-800 text-sm font-bold mb-4 border border-amber-300">
+                🔍 ยินดีต้อนรับสู่อาณาจักรการเรียนรู้!
+            </div>
+            
+            <div class="flex justify-center mb-4">
+                <div class="relative">
+                    <span class="text-7xl md:text-8xl bounce-slow inline-block">🐻</span>
+                    <span class="absolute -top-2 -right-2 text-3xl">🔍</span>
+                </div>
+            </div>
+
+            <h2 class="text-2xl md:text-4xl font-extrabold text-slate-800 mb-3">
+                มาฝึกเป็น <span class="text-amber-500">ยอดนักสืบ Pattern</span> กันเถอะ!
+            </h2>
+            <p class="text-slate-600 text-sm md:text-base max-w-lg mx-auto mb-6">
+                สังเกตสิ่งที่เกิดขึ้นซ้ำ ทายสิ่งต่อไปให้ถูกต้องผ่าน 20 ด่านแสนสนุก เพื่อรับเกียรติบัตรยอดนักสืบ!
+            </p>
+
+            <!-- 3 Steps Bar -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto mb-8 text-left">
+                <div class="bg-sky-50 p-3 rounded-2xl border-2 border-sky-200 flex items-center space-x-3">
+                    <span class="text-3xl">👀</span>
+                    <div>
+                        <div class="text-xs text-sky-600 font-bold">ขั้นที่ 1</div>
+                        <div class="text-sm font-bold text-sky-900">สังเกตสิ่งต่าง ๆ</div>
+                    </div>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-2xl border-2 border-purple-200 flex items-center space-x-3">
+                    <span class="text-3xl">🔍</span>
+                    <div>
+                        <div class="text-xs text-purple-600 font-bold">ขั้นที่ 2</div>
+                        <div class="text-sm font-bold text-purple-900">หาสิ่งที่ซ้ำ</div>
+                    </div>
+                </div>
+                <div class="bg-amber-50 p-3 rounded-2xl border-2 border-amber-200 flex items-center space-x-3">
+                    <span class="text-3xl">💡</span>
+                    <div>
+                        <div class="text-xs text-amber-600 font-bold">ขั้นที่ 3</div>
+                        <div class="text-sm font-bold text-amber-900">ทายสิ่งต่อไป</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="startGame()" class="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-extrabold text-xl px-8 py-4 rounded-2xl border-b-4 border-orange-700 shadow-xl transition transform hover:scale-105 flex items-center justify-center space-x-2">
+                    <i class="fas fa-play"></i>
+                    <span>เริ่มการผจญภัย (20 ด่าน)</span>
+                </button>
+                <button onclick="openLevelSelect()" class="bg-sky-400 hover:bg-sky-500 text-white font-bold text-lg px-6 py-4 rounded-2xl border-b-4 border-sky-600 shadow-lg transition flex items-center justify-center space-x-2">
+                    <i class="fas fa-th-large"></i>
+                    <span>เลือกด่าน</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 2: LEVEL SELECT ================= -->
+        <div id="level-screen" class="hidden w-full glass-panel p-6 md:p-8 rounded-3xl shadow-2xl border-4 border-amber-300 pop-in">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">เลือกด่านภารกิจ</h2>
+                    <p class="text-slate-500 text-sm">ปลดล็อกและสะสมดาวให้ครบทั้ง 20 ด่าน!</p>
+                </div>
+                <button onclick="showHomeScreen()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold">
+                    <i class="fas fa-arrow-left mr-1"></i> หน้าหลัก
+                </button>
+            </div>
+
+            <div id="levels-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4 mb-6">
+                <!-- Level Cards dynamically injected -->
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 3: GAMEPLAY SCREEN ================= -->
+        <div id="game-screen" class="hidden w-full glass-panel p-4 md:p-8 rounded-3xl shadow-2xl border-4 border-amber-300 pop-in">
+            
+            <!-- Level Info Bar -->
+            <div class="flex justify-between items-center mb-4 bg-amber-50 p-3 rounded-2xl border border-amber-200">
+                <div class="flex items-center space-x-2">
+                    <span id="level-badge" class="bg-amber-400 text-amber-950 font-extrabold text-sm px-3 py-1 rounded-xl shadow-sm">
+                        ด่านที่ 1
+                    </span>
+                    <span id="level-title" class="font-bold text-slate-700 text-sm md:text-base">
+                        รูปแบบของสี
+                    </span>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="openLevelSelect()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-1.5 rounded-xl">
+                        เปลี่ยนด่าน
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mascot Guidance Banner -->
+            <div class="mb-4 bg-sky-50 border-2 border-sky-200 rounded-2xl p-3 flex items-start space-x-3">
+                <div class="text-3xl shrink-0">🐻</div>
+                <div>
+                    <div class="text-xs font-bold text-sky-600">คุณครูหมีน้อยแนะแนว:</div>
+                    <p id="mascot-hint" class="text-sm font-semibold text-sky-900">
+                        ลองสังเกตดูสิว่า สิ่งไหนที่เกิดขึ้นซ้ำกันนะ?
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pattern Display Board -->
+            <div class="bg-gradient-to-b from-indigo-900 to-slate-900 p-4 md:p-8 rounded-3xl shadow-inner border-4 border-indigo-300 mb-6 flex flex-col items-center justify-center min-h-[180px] md:min-h-[220px]">
+                
+                <div class="text-xs text-indigo-200 font-semibold mb-3 flex items-center space-x-2">
+                    <span>👀 มองดูและหา Pattern ที่ซ้ำ</span>
+                    <i class="fas fa-sparkles text-yellow-300"></i>
+                </div>
+
+                <!-- Pattern Slots Container -->
+                <div id="pattern-container" class="flex flex-wrap items-center justify-center gap-2 md:gap-3 my-2">
+                    <!-- Pattern Items dynamically injected here -->
+                </div>
+            </div>
+
+            <!-- Interactive Answer Choices Area -->
+            <div class="bg-white p-4 md:p-6 rounded-2xl border-2 border-slate-200 shadow-sm text-center mb-4">
+                <h3 class="text-sm md:text-base font-bold text-slate-700 mb-3">
+                    💡 เลือกคำตอบที่ควรจะอยู่ในช่องเครื่องหมาย <span class="text-red-500 font-extrabold">❓</span>
+                </h3>
+
+                <div id="choices-container" class="flex flex-wrap justify-center gap-3 md:gap-4">
+                    <!-- Choice buttons generated dynamically -->
+                </div>
+            </div>
+
+            <!-- Bottom Actions Bar -->
+            <div class="flex justify-between items-center text-xs md:text-sm">
+                <button onclick="showStepHint()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold px-3 py-2 rounded-xl flex items-center space-x-1 border border-purple-300">
+                    <i class="fas fa-lightbulb text-yellow-500"></i>
+                    <span>คำใบ้ (3 ขั้นตอน)</span>
+                </button>
+
+                <div class="text-slate-500 font-semibold">
+                    ด่าน <span id="current-level-num">1</span> จาก 20
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ================= MODAL 1: LESSON / GUIDE MODAL ================= -->
+    <div id="guide-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl border-4 border-amber-300 pop-in">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center space-x-2">
+                    <span class="text-2xl">📖</span>
+                    <span>สรุปบทเรียน: Pattern คืออะไร?</span>
+                </h3>
+                <button onclick="closeGuideModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+            </div>
+
+            <div class="space-y-4 text-slate-700 text-sm md:text-base">
+                
+                <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                    <h4 class="font-bold text-amber-900 mb-1">1. รูปแบบ (Pattern) คืออะไร?</h4>
+                    <p class="text-slate-700">คือการจัดเรียงสิ่งต่าง ๆ ที่มีลักษณะ <span class="bg-amber-200 font-bold px-1 rounded">ซ้ำกันอย่างเป็นแบบแผน</span> เช่น สี, รูปร่าง, สิ่งของ หรือการกระทำ</p>
+                    <div class="mt-2 text-center text-lg bg-white p-2 rounded-xl border border-amber-100">
+                        🔴 🔵 🔴 🔵 🔴 <span class="text-blue-600 font-bold">🔵</span>
+                    </div>
+                </div>
+
+                <div class="bg-sky-50 p-4 rounded-2xl border border-sky-200">
+                    <h4 class="font-bold text-sky-900 mb-1">2. การหารูปแบบทำอย่างไร? (3 ขั้นง่าย ๆ)</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                        <li><strong>👀 ขั้นที่ 1 สังเกต:</strong> มองดูสิ่งต่าง ๆ ว่ามีอะไรบ้าง</li>
+                        <li><strong>🔍 ขั้นที่ 2 หาสิ่งที่ซ้ำ:</strong> ลองหาว่า “อะไรเกิดขึ้นซ้ำ?”</li>
+                        <li><strong>💡 ขั้นที่ 3 ทายสิ่งต่อไป:</strong> เมื่อรู้ส่วนที่ซ้ำ ก็ทายรูปต่อไปได้!</li>
+                    </ul>
+                </div>
+
+                <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
+                    <h4 class="font-bold text-emerald-900 mb-2">3. ตัวอย่าง Pattern แบบต่าง ๆ</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
+                        <div class="bg-white p-2 rounded-xl border border-emerald-100">
+                            <strong>🎨 สี:</strong> 🔴 🔵 🔴 🔵
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-emerald-100">
+                            <strong>🔺 รูปร่าง:</strong> 🔺 ⭕ 🔺 ⭕
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-emerald-100">
+                            <strong>🍎 สิ่งของ:</strong> 🍎 🍌 🍎 🍌
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-emerald-100">
+                            <strong>👏 การกระทำ:</strong> 👏 👇 👏 👇
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-6 text-center">
+                <button onclick="closeGuideModal()" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-extrabold px-6 py-2.5 rounded-2xl shadow-md border-b-4 border-amber-600">
+                    เข้าใจแล้ว! ไปลุยกันเลย
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 2: WIN / LEVEL COMPLETE MODAL ================= -->
+    <div id="win-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border-4 border-emerald-400 pop-in">
+            <div class="text-6xl mb-2">🎉</div>
+            <h3 class="text-2xl font-extrabold text-emerald-600 mb-1">ถูกต้องแล้วครับ!</h3>
+            <p id="win-message" class="text-slate-600 text-sm mb-4">เก่งมาก! คุณหา Pattern ได้ถูกต้อง</p>
+
+            <div class="text-3xl text-amber-400 mb-6 flex justify-center space-x-2">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+
+            <div class="flex justify-center space-x-3">
+                <button onclick="nextLevel()" class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-extrabold text-lg px-6 py-3 rounded-2xl border-b-4 border-teal-700 shadow-lg hover:scale-105 transition flex items-center space-x-2">
+                    <span>ด่านถัดไป</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 3: CERTIFICATE MODAL ================= -->
+    <div id="certificate-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="bg-amber-50 rounded-3xl max-w-2xl w-full p-6 md:p-10 text-center shadow-2xl border-8 border-amber-400 relative pop-in">
+            
+            <button onclick="closeCertificate()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+
+            <!-- Certificate Inner Frame -->
+            <div class="border-4 border-dashed border-amber-300 p-6 rounded-2xl bg-white">
+                <div class="text-4xl md:text-5xl mb-2">🏆</div>
+                <div class="text-xs font-bold tracking-widest text-amber-700 uppercase mb-1">CERTIFICATE OF ACHIEVEMENT</div>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-amber-900 mb-3">เกียรติบัตรยอดนักสืบ Pattern ป.1</h2>
+                
+                <p class="text-slate-600 text-sm md:text-base mb-4">
+                    ขอมอบเกียรติบัตรฉบับนี้เพื่อแสดงว่า
+                </p>
+
+                <div class="inline-block border-b-2 border-amber-500 px-8 py-1 mb-4">
+                    <span class="text-xl md:text-2xl font-bold text-sky-900">นักเรียนยอดนักสืบ Pattern</span>
+                </div>
+
+                <p class="text-slate-600 text-xs md:text-sm max-w-md mx-auto mb-6">
+                    ได้ผ่านการทดสอบทักษะการหารูปแบบ (Pattern Recognition) <br>ครบทั้ง 20 ด่าน ในวิชาวิทยาการคำนวณ ชั้นประถมศึกษาปีที่ 1
+                </p>
+
+                <div class="flex justify-around items-center pt-4 border-t border-slate-100 text-xs text-slate-500">
+                    <div>
+                        <span class="text-xl block">🐻</span>
+                        <span class="font-bold">คุณครูหมีน้อย</span>
+                        <br>ผู้สอน
+                    </div>
+                    <div>
+                        <span class="text-xl block">⭐️⭐️⭐️</span>
+                        <span class="font-bold text-amber-600">คะแนนเต็ม 20 ด่าน</span>
+                        <br>เหรียญทอง Pattern
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print / Action Buttons -->
+            <div class="no-print mt-6 flex justify-center space-x-3">
+                <button onclick="window.print()" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-5 py-2.5 rounded-xl border-b-4 border-amber-600 shadow flex items-center space-x-2">
+                    <i class="fas fa-print"></i>
+                    <span>พิมพ์เกียรติบัตร</span>
+                </button>
+                <button onclick="showHomeScreen(); closeCertificate();" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2.5 rounded-xl">
+                    กลับหน้าแรก
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* -------------------------------------------------------------
+         * WEB AUDIO SYNTHESIZER (No external audio file dependency)
+         * ------------------------------------------------------------- */
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleSound() {
+            isMuted = !isMuted;
+            const soundBtn = document.getElementById('sound-btn');
+            const soundIcon = document.getElementById('sound-icon');
+            if (isMuted) {
+                soundIcon.className = 'fas fa-volume-mute text-lg text-slate-400';
+                soundBtn.classList.add('bg-slate-200');
+            } else {
+                soundIcon.className = 'fas fa-volume-up text-lg text-blue-700';
+                soundBtn.classList.remove('bg-slate-200');
+                playSound('click');
+            }
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+                
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'correct') {
+                    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                    notes.forEach((freq, index) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + index * 0.08);
+                        gain.gain.setValueAtTime(0.2, now + index * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.08 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + index * 0.08);
+                        osc.stop(now + index * 0.08 + 0.25);
+                    });
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'win') {
+                    const melody = [
+                        { f: 523.25, d: 0.15 },
+                        { f: 659.25, d: 0.15 },
+                        { f: 783.99, d: 0.15 },
+                        { f: 1046.50, d: 0.4 }
+                    ];
+                    let time = now;
+                    melody.forEach(note => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(note.f, time);
+                        gain.gain.setValueAtTime(0.25, time);
+                        gain.gain.exponentialRampToValueAtTime(0.001, time + note.d);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(time);
+                        osc.stop(time + note.d);
+                        time += note.d * 0.8;
+                    });
+                }
+            } catch (e) {
+                console.log("Audio playback:", e);
+            }
+        }
+
+        /* -------------------------------------------------------------
+         * GAME DATA: 20 LEVELS (Aligned with Grade 1 Syllabus)
+         * ------------------------------------------------------------- */
+        const LEVELS = [
+            {
+                id: 1,
+                title: "3.1 รูปแบบของสี (Color Pattern)",
+                hint: "ลองสังเกตการสลับสี แดง → น้ำเงิน สิครับ",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🔴', label: 'สีแดง' },
+                    { type: 'emoji', value: '🔵', label: 'สีน้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'สีแดง' },
+                    { type: 'emoji', value: '🔵', label: 'สีน้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'สีแดง' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🔵'],
+                choices: [
+                    { type: 'emoji', value: '🔵', label: 'สีน้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'สีแดง' },
+                    { type: 'emoji', value: '🟡', label: 'สีเหลือง' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🔴 → 🔵) ดังนั้นคำตอบคือ 🔵 สีน้ำเงิน"
+            },
+            {
+                id: 2,
+                title: "3.2 รูปแบบของรูปร่าง (Shape Pattern)",
+                hint: "สามเหลี่ยม สลับกับ วงกลม สิ่งต่อไปคืออะไรนะ?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🔺', label: 'สามเหลี่ยม' },
+                    { type: 'emoji', value: '⭕', label: 'วงกลม' },
+                    { type: 'emoji', value: '🔺', label: 'สามเหลี่ยม' },
+                    { type: 'emoji', value: '⭕', label: 'วงกลม' },
+                    { type: 'emoji', value: '🔺', label: 'สามเหลี่ยม' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['⭕'],
+                choices: [
+                    { type: 'emoji', value: '🔺', label: 'สามเหลี่ยม' },
+                    { type: 'emoji', value: '⭕', label: 'วงกลม' },
+                    { type: 'emoji', value: '⬛', label: 'สี่เหลี่ยม' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🔺 → ⭕) ดังนั้นคำตอบคือ ⭕ วงกลม"
+            },
+            {
+                id: 3,
+                title: "3.3 รูปแบบของผลไม้ (Fruit Pattern)",
+                hint: "แอปเปิล สลับกับ กล้วย ทายสิผลไม้ต่อไปคืออะไร?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🍎', label: 'แอปเปิล' },
+                    { type: 'emoji', value: '🍌', label: 'กล้วย' },
+                    { type: 'emoji', value: '🍎', label: 'แอปเปิล' },
+                    { type: 'emoji', value: '🍌', label: 'กล้วย' },
+                    { type: 'emoji', value: '🍎', label: 'แอปเปิล' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🍌'],
+                choices: [
+                    { type: 'emoji', value: '🍎', label: 'แอปเปิล' },
+                    { type: 'emoji', value: '🍌', label: 'กล้วย' },
+                    { type: 'emoji', value: '🍊', label: 'ส้ม' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🍎 → 🍌) ดังนั้นคำตอบคือ 🍌 กล้วย"
+            },
+            {
+                id: 4,
+                title: "7.1 Pattern ในชีวิตประจำวัน (สร้อยลูกปัด)",
+                hint: "ลูกปัดสีเหลือง สลับกับ สีเขียว ลูกต่อไปสีอะไรดีนะ?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🟡', label: 'ลูกปัดเหลือง' },
+                    { type: 'emoji', value: '🟢', label: 'ลูกปัดเขียว' },
+                    { type: 'emoji', value: '🟡', label: 'ลูกปัดเหลือง' },
+                    { type: 'emoji', value: '🟢', label: 'ลูกปัดเขียว' },
+                    { type: 'emoji', value: '🟡', label: 'ลูกปัดเหลือง' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🟢'],
+                choices: [
+                    { type: 'emoji', value: '🟡', label: 'ลูกปัดเหลือง' },
+                    { type: 'emoji', value: '🟢', label: 'ลูกปัดเขียว' },
+                    { type: 'emoji', value: '🔴', label: 'ลูกปัดแดง' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🟡 → 🟢) ดังนั้นคำตอบคือ 🟢 ลูกปัดสีเขียว"
+            },
+            {
+                id: 5,
+                title: "3.1.2 รูปแบบสี 3 สี (Color Pattern)",
+                hint: "คราวนี้มี 3 สีสลับกัน: แดง → เหลือง → น้ำเงิน",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🟡', label: 'เหลือง' },
+                    { type: 'emoji', value: '🔵', label: 'น้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🟡', label: 'เหลือง' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🔵'],
+                choices: [
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🟡', label: 'เหลือง' },
+                    { type: 'emoji', value: '🔵', label: 'น้ำเงิน' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🔴 → 🟡 → 🔵) หลังสีเหลืองคือ 🔵 สีน้ำเงิน"
+            },
+            {
+                id: 6,
+                title: "3.2.2 รูปแบบรูปร่างและทรง (Shape Pattern)",
+                hint: "สี่เหลี่ยมดำ สลับกับ วงกลมแดง สิ่งต่อไปคืออะไร?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '⬛', label: 'สี่เหลี่ยมดำ' },
+                    { type: 'emoji', value: '🔴', label: 'วงกลมแดง' },
+                    { type: 'emoji', value: '⬛', label: 'สี่เหลี่ยมดำ' },
+                    { type: 'emoji', value: '🔴', label: 'วงกลมแดง' },
+                    { type: 'emoji', value: '⬛', label: 'สี่เหลี่ยมดำ' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🔴'],
+                choices: [
+                    { type: 'emoji', value: '⬛', label: 'สี่เหลี่ยมดำ' },
+                    { type: 'emoji', value: '🔴', label: 'วงกลมแดง' },
+                    { type: 'emoji', value: '⭐', label: 'ดาวเหลือง' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (⬛ → 🔴) ดังนั้นคำตอบคือ 🔴 วงกลมแดง"
+            },
+            {
+                id: 7,
+                title: "3.3.2 รูปแบบสัตว์เลี้ยงน่ารัก (Animal Pattern)",
+                hint: "แมว 🐱 สลับกับ หมา 🐶 สัตว์ตัวต่อไปคืออะไรนะ?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🐱', label: 'น้องแมว' },
+                    { type: 'emoji', value: '🐶', label: 'น้องหมา' },
+                    { type: 'emoji', value: '🐱', label: 'น้องแมว' },
+                    { type: 'emoji', value: '🐶', label: 'น้องหมา' },
+                    { type: 'emoji', value: '🐱', label: 'น้องแมว' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🐶'],
+                choices: [
+                    { type: 'emoji', value: '🐱', label: 'น้องแมว' },
+                    { type: 'emoji', value: '🐶', label: 'น้องหมา' },
+                    { type: 'emoji', value: '🐰', label: 'น้องกระต่าย' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🐱 → 🐶) ถัดจากน้องแมวคือ 🐶 น้องหมา"
+            },
+            {
+                id: 8,
+                title: "6.1 รูปแบบของการกระทำ (Action Pattern)",
+                hint: "ปรบมือ 👏 สลับกับ แตะโต๊ะ 👇 ทายสิจังหวะถัดไปทำอะไร?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '👏', label: 'ปรบมือ' },
+                    { type: 'emoji', value: '👇', label: 'แตะโต๊ะ' },
+                    { type: 'emoji', value: '👏', label: 'ปรบมือ' },
+                    { type: 'emoji', value: '👇', label: 'แตะโต๊ะ' },
+                    { type: 'emoji', value: '👏', label: 'ปรบมือ' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['👇'],
+                choices: [
+                    { type: 'emoji', value: '👏', label: 'ปรบมือ' },
+                    { type: 'emoji', value: '👇', label: 'แตะโต๊ะ' },
+                    { type: 'emoji', value: '✋', label: 'แตะไหล่' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (ปรบมือ 👏 → แตะโต๊ะ 👇) ดังนั้นการกระทำถัดไปคือ 👇 แตะโต๊ะ"
+            },
+            {
+                id: 9,
+                title: "4.1 รูปแบบ 3 สิ่ง (ดาว หัวใจ วงกลม)",
+                hint: "สังเกต 3 สิ่งซ้ำกัน: ดาว → หัวใจ → วงกลม",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '⭐', label: 'ดาว' },
+                    { type: 'emoji', value: '❤️', label: 'หัวใจ' },
+                    { type: 'emoji', value: '🔵', label: 'วงกลม' },
+                    { type: 'emoji', value: '⭐', label: 'ดาว' },
+                    { type: 'emoji', value: '❤️', label: 'หัวใจ' },
+                    { type: 'emoji', value: '🔵', label: 'วงกลม' },
+                    { type: 'emoji', value: '⭐', label: 'ดาว' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['❤️'],
+                choices: [
+                    { type: 'emoji', value: '⭐', label: 'ดาว' },
+                    { type: 'emoji', value: '❤️', label: 'หัวใจ' },
+                    { type: 'emoji', value: '🔵', label: 'วงกลม' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (⭐ → ❤️ → 🔵) ดังนั้นรูปถัดจาก ดาว คือ ❤️ หัวใจ"
+            },
+            {
+                id: 10,
+                title: "5.1 รูปแบบซ้ำสิ่งเดียวกัน (แดง แดง น้ำเงิน)",
+                hint: "มีสิ่งเดียวกันติดกัน 2 ครั้ง: แดง → แดง → น้ำเงิน",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔵', label: 'น้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔵', label: 'น้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🔴'],
+                choices: [
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔵', label: 'น้ำเงิน' },
+                    { type: 'emoji', value: '🟡', label: 'เหลือง' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🔴 🔴 🔵) เมื่อมี 🔴 ตัวแรกแล้ว ตัวถัดไปก็คือ 🔴 สีแดง"
+            },
+            {
+                id: 11,
+                title: "7.2 ตัวต่อบล็อกสี (Toy Block Pattern)",
+                hint: "บล็อกสีแดง สลับกับ บล็อกสีฟ้า บล็อกถัดไปสีอะไร?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🧱', label: 'บล็อกแดง' },
+                    { type: 'emoji', value: '🟦', label: 'บล็อกฟ้า' },
+                    { type: 'emoji', value: '🧱', label: 'บล็อกแดง' },
+                    { type: 'emoji', value: '🟦', label: 'บล็อกฟ้า' },
+                    { type: 'emoji', value: '🧱', label: 'บล็อกแดง' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🟦'],
+                choices: [
+                    { type: 'emoji', value: '🧱', label: 'บล็อกแดง' },
+                    { type: 'emoji', value: '🟦', label: 'บล็อกฟ้า' },
+                    { type: 'emoji', value: '🟩', label: 'บล็อกเขียว' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🧱 → 🟦) ถัดจากบล็อกแดงคือ 🟦 บล็อกฟ้า"
+            },
+            {
+                id: 12,
+                title: "3.3.3 รูปแบบของขนมหวาน (Snack Pattern)",
+                hint: "ไอศกรีม 🍦 สลับกับ โดนัท 🍩 ขนมชิ้นต่อไปคืออะไร?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🍦', label: 'ไอศกรีม' },
+                    { type: 'emoji', value: '🍩', label: 'โดนัท' },
+                    { type: 'emoji', value: '🍦', label: 'ไอศกรีม' },
+                    { type: 'emoji', value: '🍩', label: 'โดนัท' },
+                    { type: 'emoji', value: '🍦', label: 'ไอศกรีม' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🍩'],
+                choices: [
+                    { type: 'emoji', value: '🍦', label: 'ไอศกรีม' },
+                    { type: 'emoji', value: '🍩', label: 'โดนัท' },
+                    { type: 'emoji', value: '🍰', label: 'เค้ก' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🍦 → 🍩) ถัดจากไอศกรีมคือ 🍩 โดนัท"
+            },
+            {
+                id: 13,
+                title: "6.2 รูปแบบการกระทำ 3 ท่า (Movement Pattern)",
+                hint: "ปรบมือ 👏 → แตะไหล่ ✋ → ชูมือ 🙆 ท่าต่อไปคืออะไร?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '👏', label: 'ปรบมือ' },
+                    { type: 'emoji', value: '✋', label: 'แตะไหล่' },
+                    { type: 'emoji', value: '🙆', label: 'ชูมือ' },
+                    { type: 'emoji', value: '👏', label: 'ปรบมือ' },
+                    { type: 'emoji', value: '✋', label: 'แตะไหล่' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🙆'],
+                choices: [
+                    { type: 'emoji', value: '👏', label: 'ปรบมือ' },
+                    { type: 'emoji', value: '✋', label: 'แตะไหล่' },
+                    { type: 'emoji', value: '🙆', label: 'ชูมือ' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (👏 → ✋ → 🙆) ถัดจากแตะไหล่คือ 🙆 ชูมือ"
+            },
+            {
+                id: 14,
+                title: "5.2 รูปแบบสัตว์ซ้ำสิ่งเดียวกัน (แมว หมา หมา)",
+                hint: "น้องแมว 1 ตัว สลับกับ น้องหมา 2 ตัว! (🐱 🐶 🐶)",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🐱', label: 'น้องแมว' },
+                    { type: 'emoji', value: '🐶', label: 'น้องหมา' },
+                    { type: 'emoji', value: '🐶', label: 'น้องหมา' },
+                    { type: 'emoji', value: '🐱', label: 'น้องแมว' },
+                    { type: 'emoji', value: '🐶', label: 'น้องหมา' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🐶'],
+                choices: [
+                    { type: 'emoji', value: '🐱', label: 'น้องแมว' },
+                    { type: 'emoji', value: '🐶', label: 'น้องหมา' },
+                    { type: 'emoji', value: '🐰', label: 'น้องกระต่าย' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🐱 🐶 🐶) เมื่อมี 🐶 ตัวแรกแล้ว ตัวถัดไปก็คือ 🐶 น้องหมา"
+            },
+            {
+                id: 15,
+                title: "7.3 สวนดอกไม้สวยงาม (Flower Pattern)",
+                hint: "ดอกซากุระ 🌸 สลับกับ ดอกทานตะวัน 🌻 ดอกต่อไปคือ?",
+                type: "single",
+                sequence: [
+                    { type: 'emoji', value: '🌸', label: 'ดอกซากุระ' },
+                    { type: 'emoji', value: '🌻', label: 'ดอกทานตะวัน' },
+                    { type: 'emoji', value: '🌸', label: 'ดอกซากุระ' },
+                    { type: 'emoji', value: '🌻', label: 'ดอกทานตะวัน' },
+                    { type: 'emoji', value: '🌸', label: 'ดอกซากุระ' },
+                    { type: 'blank', id: 0 }
+                ],
+                answer: ['🌻'],
+                choices: [
+                    { type: 'emoji', value: '🌸', label: 'ดอกซากุระ' },
+                    { type: 'emoji', value: '🌻', label: 'ดอกทานตะวัน' },
+                    { type: 'emoji', value: '🌹', label: 'ดอกกุหลาบ' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🌸 → 🌻) ดอกต่อไปคือ 🌻 ดอกทานตะวัน"
+            },
+            {
+                id: 16,
+                title: "4.2 ท้าทาย! เติม 2 ช่อง (ดาว หัวใจ วงกลม)",
+                hint: "ต้องทาย 2 รูปต่อกันเลยนะ! (ดาว → หัวใจ → วงกลม)",
+                type: "double",
+                sequence: [
+                    { type: 'emoji', value: '⭐', label: 'ดาว' },
+                    { type: 'emoji', value: '❤️', label: 'หัวใจ' },
+                    { type: 'emoji', value: '🔵', label: 'วงกลม' },
+                    { type: 'emoji', value: '⭐', label: 'ดาว' },
+                    { type: 'emoji', value: '❤️', label: 'หัวใจ' },
+                    { type: 'emoji', value: '🔵', label: 'วงกลม' },
+                    { type: 'emoji', value: '⭐', label: 'ดาว' },
+                    { type: 'blank', id: 0 },
+                    { type: 'blank', id: 1 }
+                ],
+                answer: ['❤️', '🔵'],
+                choicesCombo: [
+                    { values: ['❤️', '🔵'], label: '❤️ แล้วตามด้วย 🔵' },
+                    { values: ['🔵', '⭐'], label: '🔵 แล้วตามด้วย ⭐' },
+                    { values: ['⭐', '❤️'], label: '⭐ แล้วตามด้วย ❤️' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (⭐ ❤️ 🔵) หลัง ⭐ จึงเป็น ❤️ แล้วตามด้วย 🔵"
+            },
+            {
+                id: 17,
+                title: "5.3 ท้าทาย! เติม 2 ช่อง (แดง แดง น้ำเงิน)",
+                hint: "ทาย 2 ช่องสุดท้ายของชุด (🔴 🔴 🔵 | 🔴 🔴 🔵 | 🔴 ❓ ❓)",
+                type: "double",
+                sequence: [
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔵', label: 'น้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'emoji', value: '🔵', label: 'น้ำเงิน' },
+                    { type: 'emoji', value: '🔴', label: 'แดง' },
+                    { type: 'blank', id: 0 },
+                    { type: 'blank', id: 1 }
+                ],
+                answer: ['🔴', '🔵'],
+                choicesCombo: [
+                    { values: ['🔴', '🔵'], label: '🔴 แล้วตามด้วย 🔵' },
+                    { values: ['🔵', '🔴'], label: '🔵 แล้วตามด้วย 🔴' },
+                    { values: ['🔴', '🔴'], label: '🔴 แล้วตามด้วย 🔴' }
+                ],
+                explanation: "ชุดที่ซ้ำคือ (🔴 🔴 🔵) สองช่องถัดไปคือ 🔴 และ 🔵"
+            },
+            {
+                id: 18,
+                title: "7.4 ท้าทาย! สร้อยอัญมณี 2 ช่อง",
+                hint: "เพชร 💎 สลับกับ มงกุฎ 👑 ทาย 2 อันถัดไป!",
+                type: "double",
+                sequence: [
+                    { type: 'emoji', value: '💎', label: 'เพชร' },
+                    { type: 'emoji', value: '👑', label: 'มงกุฎ' },
+                    { type: 'emoji', value: '💎', label: 'เพชร' },
+                    { type: 'emoji', value: '👑', label: 'มงกุฎ' },
+                    { type: 'emoji', value: '💎', label: 'เพชร' },
+                    { type: 'blank', id: 0 },
+                    { type: 'blank', id: 1 }
+                ],
+                answer: ['👑', '💎'],
+                choicesCombo: [
+                    { values: ['👑', '💎'], label: '👑 แล้วตามด้วย 💎' },
+                    { values: ['💎', '👑'], label: '💎 แล้วตามด้วย 👑' },
+                    { values: ['👑', '👑'], label: '👑 แล้วตามด้วย 👑' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (💎 👑) สองสิ่งถัดไปคือ 👑 และ 💎"
+            },
+            {
+                id: 19,
+                title: "6.3 ท้าทาย! การออกกำลังกาย 2 ช่อง",
+                hint: "วิ่ง 🏃 สลับกับ เดิน 🚶 ทายจังหวะถัดไป 2 ท่า!",
+                type: "double",
+                sequence: [
+                    { type: 'emoji', value: '🏃', label: 'วิ่ง' },
+                    { type: 'emoji', value: '🚶', label: 'เดิน' },
+                    { type: 'emoji', value: '🏃', label: 'วิ่ง' },
+                    { type: 'emoji', value: '🚶', label: 'เดิน' },
+                    { type: 'emoji', value: '🏃', label: 'วิ่ง' },
+                    { type: 'blank', id: 0 },
+                    { type: 'blank', id: 1 }
+                ],
+                answer: ['🚶', '🏃'],
+                choicesCombo: [
+                    { values: ['🚶', '🏃'], label: '🚶 เดิน แล้วตามด้วย 🏃 วิ่ง' },
+                    { values: ['🏃', '🚶'], label: '🏃 วิ่ง แล้วตามด้วย 🚶 เดิน' },
+                    { values: ['🚶', '🚶'], label: '🚶 เดิน แล้วตามด้วย 🚶 เดิน' }
+                ],
+                explanation: "ส่วนที่ซ้ำคือ (🏃 🚶) สองท่าถัดไปคือ 🚶 เดิน แล้ว 🏃 วิ่ง"
+            },
+            {
+                id: 20,
+                title: "🏆 ด่านปรมาจารย์: Pattern เสื้อผ้าและสิ่งของ",
+                hint: "ด่านสุดท้าย! เสื้อ 👕 สองตัว สลับกับ สร้อย 📿 หนึ่งเส้น!",
+                type: "double",
+                sequence: [
+                    { type: 'emoji', value: '👕', label: 'เสื้อ' },
+                    { type: 'emoji', value: '👕', label: 'เสื้อ' },
+                    { type: 'emoji', value: '📿', label: 'สร้อย' },
+                    { type: 'emoji', value: '👕', label: 'เสื้อ' },
+                    { type: 'emoji', value: '👕', label: 'เสื้อ' },
+                    { type: 'emoji', value: '📿', label: 'สร้อย' },
+                    { type: 'emoji', value: '👕', label: 'เสื้อ' },
+                    { type: 'blank', id: 0 },
+                    { type: 'blank', id: 1 }
+                ],
+                answer: ['👕', '📿'],
+                choicesCombo: [
+                    { values: ['👕', '📿'], label: '👕 เสื้อ แล้ว 📿 สร้อย' },
+                    { values: ['📿', '👕'], label: '📿 สร้อย แล้ว 👕 เสื้อ' },
+                    { values: ['📿', '📿'], label: '📿 สร้อย แล้ว 📿 สร้อย' }
+                ],
+                explanation: "ชุดที่ซ้ำคือ (👕 👕 📿) คำตอบคือ 👕 เสื้อ และ 📿 สร้อย"
+            }
+        ];
+
+        /* -------------------------------------------------------------
+         * GAME STATE MANAGEMENT
+         * ------------------------------------------------------------- */
+        let currentLevelIndex = 0;
+        let levelProgress = {};
+
+        try {
+            levelProgress = JSON.parse(localStorage.getItem('pattern_game_progress')) || {};
+        } catch (e) {
+            levelProgress = {};
+        }
+
+        window.onload = function() {
+            renderLevelGrid();
+        };
+
+        function showHomeScreen() {
+            playSound('click');
+            document.getElementById('home-screen').classList.remove('hidden');
+            document.getElementById('level-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+        }
+
+        function openLevelSelect() {
+            playSound('click');
+            renderLevelGrid();
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('level-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+        }
+
+        function startGame() {
+            playSound('click');
+            loadLevel(0);
+        }
+
+        function renderLevelGrid() {
+            const grid = document.getElementById('levels-grid');
+            grid.innerHTML = '';
+
+            LEVELS.forEach((level, idx) => {
+                const isCompleted = levelProgress[level.id];
+                const card = document.createElement('div');
+                
+                card.className = `p-4 rounded-2xl border-4 text-center cursor-pointer transition transform hover:-translate-y-1 shadow-md ${
+                    isCompleted 
+                        ? 'bg-emerald-50 border-emerald-300' 
+                        : 'bg-white border-amber-200 hover:border-amber-400'
+                }`;
+                card.onclick = () => { playSound('click'); loadLevel(idx); };
+
+                card.innerHTML = `
+                    <div class="text-xs font-extrabold ${isCompleted ? 'text-emerald-600' : 'text-amber-600'} mb-1">
+                        ด่านที่ ${level.id}
+                    </div>
+                    <div class="text-3xl my-1">
+                        ${isCompleted ? '⭐' : '🔍'}
+                    </div>
+                    <div class="text-xs font-semibold text-slate-700 truncate">
+                        ${level.title.split(' ')[1] || level.title}
+                    </div>
+                    <div class="mt-2 text-xs font-bold ${isCompleted ? 'text-emerald-600' : 'text-slate-400'}">
+                        ${isCompleted ? 'ผ่านแล้ว!' : 'เริ่มเล่น'}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function loadLevel(index) {
+            currentLevelIndex = index;
+            const level = LEVELS[currentLevelIndex];
+
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('level-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            document.getElementById('level-badge').innerText = `ด่านที่ ${level.id}`;
+            document.getElementById('level-title').innerText = level.title;
+            document.getElementById('mascot-hint').innerText = level.hint;
+            document.getElementById('current-level-num').innerText = level.id;
+
+            const container = document.getElementById('pattern-container');
+            container.innerHTML = '';
+
+            level.sequence.forEach((item) => {
+                if (item.type === 'emoji') {
+                    const el = document.createElement('div');
+                    el.className = 'item-card bg-white p-3 md:p-4 rounded-2xl text-3xl md:text-5xl flex items-center justify-center border-2 border-indigo-200 transform hover:scale-110';
+                    el.innerText = item.value;
+                    el.title = item.label || '';
+                    container.appendChild(el);
+                } else if (item.type === 'blank') {
+                    const el = document.createElement('div');
+                    el.className = 'item-card bg-amber-300 border-4 border-dashed border-amber-500 p-3 md:p-4 rounded-2xl text-3xl md:text-5xl flex items-center justify-center text-amber-900 font-extrabold pulse-gentle min-w-[60px] md:min-w-[80px] min-h-[60px] md:min-h-[80px]';
+                    el.innerText = '❓';
+                    el.id = `blank-slot-${item.id}`;
+                    container.appendChild(el);
+                }
+            });
+
+            const choicesContainer = document.getElementById('choices-container');
+            choicesContainer.innerHTML = '';
+
+            if (level.type === 'single') {
+                level.choices.forEach((choice) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 p-3 md:p-4 rounded-2xl text-3xl md:text-4xl flex flex-col items-center justify-center space-y-1 min-w-[90px] md:min-w-[110px]';
+                    btn.onclick = () => checkAnswer([choice.value]);
+
+                    btn.innerHTML = `
+                        <span>${choice.value}</span>
+                        <span class="text-xs font-bold text-slate-600">${choice.label}</span>
+                    `;
+                    choicesContainer.appendChild(btn);
+                });
+            } else if (level.type === 'double') {
+                level.choicesCombo.forEach((combo) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 p-3 md:p-4 rounded-2xl text-2xl md:text-3xl flex flex-col items-center justify-center space-y-1 min-w-[140px] md:min-w-[170px]';
+                    btn.onclick = () => checkAnswer(combo.values);
+
+                    btn.innerHTML = `
+                        <div class="flex space-x-2">
+                            <span>${combo.values[0]}</span>
+                            <span>${combo.values[1]}</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-600">${combo.label}</span>
+                    `;
+                    choicesContainer.appendChild(btn);
+                });
+            }
+        }
+
+        /* -------------------------------------------------------------
+         * ANSWER CHECKING & GAME WIN LOGIC
+         * ------------------------------------------------------------- */
+        function checkAnswer(userAnswer) {
+            const level = LEVELS[currentLevelIndex];
+            const isCorrect = JSON.stringify(userAnswer) === JSON.stringify(level.answer);
+
+            if (isCorrect) {
+                playSound('correct');
+
+                level.sequence.filter(s => s.type === 'blank').forEach((blank, idx) => {
+                    const slot = document.getElementById(`blank-slot-${blank.id}`);
+                    if (slot) {
+                        slot.innerText = userAnswer[idx];
+                        slot.classList.remove('bg-amber-300', 'border-dashed');
+                        slot.classList.add('bg-emerald-300', 'border-emerald-500');
+                    }
+                });
+
+                levelProgress[level.id] = true;
+                try {
+                    localStorage.setItem('pattern_game_progress', JSON.stringify(levelProgress));
+                } catch (e) {}
+
+                setTimeout(() => {
+                    document.getElementById('win-message').innerText = level.explanation;
+                    document.getElementById('win-modal').classList.remove('hidden');
+                    document.getElementById('win-modal').classList.add('flex');
+
+                    confetti({
+                        particleCount: 80,
+                        spread: 60,
+                        origin: { y: 0.6 }
+                    });
+                }, 400);
+
+            } else {
+                playSound('wrong');
+                
+                const mascotHint = document.getElementById('mascot-hint');
+                mascotHint.innerText = '❌ ลองสังเกตใหม่อีกครั้งนะครับ! คำตอบนี้ยังไม่ถูกต้อง';
+                mascotHint.parentElement.parentElement.classList.replace('bg-sky-50', 'bg-rose-50');
+                mascotHint.parentElement.parentElement.classList.replace('border-sky-200', 'border-rose-300');
+
+                setTimeout(() => {
+                    mascotHint.innerText = level.hint;
+                    mascotHint.parentElement.parentElement.classList.replace('bg-rose-50', 'bg-sky-50');
+                    mascotHint.parentElement.parentElement.classList.replace('border-rose-300', 'border-sky-200');
+                }, 2500);
+            }
+        }
+
+        function nextLevel() {
+            playSound('click');
+            document.getElementById('win-modal').classList.add('hidden');
+            document.getElementById('win-modal').classList.remove('flex');
+
+            if (currentLevelIndex + 1 < LEVELS.length) {
+                loadLevel(currentLevelIndex + 1);
+            } else {
+                playSound('win');
+                showCertificate();
+            }
+        }
+
+        function showStepHint() {
+            playSound('click');
+            const level = LEVELS[currentLevelIndex];
+            const mascotHint = document.getElementById('mascot-hint');
+            mascotHint.innerText = `💡 คำใบ้: 1. มองชุดสิ่งของ 2. หาส่วนที่ซ้ำกัน 3. ${level.hint}`;
+        }
+
+        /* -------------------------------------------------------------
+         * MODAL CONTROLLERS
+         * ------------------------------------------------------------- */
+        function openGuideModal() {
+            playSound('click');
+            document.getElementById('guide-modal').classList.remove('hidden');
+            document.getElementById('guide-modal').classList.add('flex');
+        }
+
+        function closeGuideModal() {
+            playSound('click');
+            document.getElementById('guide-modal').classList.add('hidden');
+            document.getElementById('guide-modal').classList.remove('flex');
+        }
+
+        function showCertificate() {
+            document.getElementById('certificate-modal').classList.remove('hidden');
+            document.getElementById('certificate-modal').classList.add('flex');
+            
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.4 }
+            });
+        }
+
+        function closeCertificate() {
+            playSound('click');
+            document.getElementById('certificate-modal').classList.add('hidden');
+            document.getElementById('certificate-modal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>
